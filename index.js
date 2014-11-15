@@ -5,10 +5,19 @@ var _ = require('lodash'),
     introspect = require('introspect'),
     TimeoutError = q.TimeoutError;
 
-function options(opts, defs) {
+function defer() {
+    var deferred = { };
+    deferred.promise = new q(function() {
+        deferred.resolve = arguments[0];
+        deferred.reject = arguments[1];
+    });
+    return deferred;
+}
+
+var Majic = function options(opts, defs) {
     if (!_.isObject(opts)) opts = { root: opts };
 
-    return _.defaults(opts, defs, {
+    _.defaults(this, opts, defs, {
         PREFIX: "majic:",
         ready: defer(),
         container: {},
@@ -18,74 +27,60 @@ function options(opts, defs) {
     });
 }
 
-function defer() {
-    var resolve, reject;
-    var promise = new q(function() {
-        resolve = arguments[0];
-        reject = arguments[1];
-    });
-
-    return {
-        resolve: resolve,
-        reject: reject,
-        promise: promise
-    };
-}
-
-function declare(options, name, timeout, override) {
-    var v = override ? undefined : options.container[name];
+Majic.prototype.declare = function(name, timeout, override) {
+    var v = override ? undefined : this.container[name];
     if (!v) {
-        options.container[name] = v = defer();
+        this.container[name] = v = defer();
         if (timeout) {
             v.promise.timeout(timeout).catch(TimeoutError, function() {
-                if (options.verbose) console.warn(options.PREFIX, "timeout resolving " + name);
-            });
+                if (this.verbose) console.warn(this.PREFIX, "timeout resolving " + name);
+            }.bind(this));
         }
     }
     return v;
 }
 
-function resolve(options, name, timeout) {
-    return declare(options, name, timeout).promise;
+Majic.prototype.resolve = function(name, timeout) {
+    return this.declare(name, timeout).promise;
 }
 
-function alias(options, src, dst) {
-    resolve(options, src).then(function(v) {
-        if (options.verbose) console.log(options.PREFIX, "aliased module", dst, "from", src);
-        declare(options, dst).resolve(v);
-    });
+Majic.prototype.alias = function(src, dst) {
+    this.resolve(src).then(function(v) {
+        if (this.verbose) console.log(this.PREFIX, "aliased module", dst, "from", src);
+        this.declare(dst).resolve(v);
+    }.bind(this));
 }
 
-function inject(options, fn, name) {
+Majic.prototype.inject = function(fn, name) {
     var params = introspect(fn);
 
-    return options.ready.promise.then(function() {
-        return q.all(_.map(params, function(p) { return resolve(options, p, 2000) })).then(function(args) {
-            if (options.verbose && name) console.log(options.PREFIX, "resolving module", name, "with args", params);
+    return this.ready.promise.then(function() {
+        return q.all(_.map(params, function(p) { return this.resolve(p, 2000) }.bind(this))).then(function(args) {
+            if (this.verbose && name) console.log(this.PREFIX, "resolving module", name, "with args", params);
             return fn.apply(null, args);
-        });
-    });
+        }.bind(this));
+    }.bind(this));
 }
 
-function crequire(options, name, path, module, override) {
+Majic.prototype.crequire = function(name, path, module, override) {
     name = name.replace(/\-/gi, '_');
 
     var from = module ? "from npm" : "from"
-    var deferred = declare(options, name, module ? undefined : 2000, override);
+    var deferred = this.declare(name, module ? undefined : 2000, override);
     var req = require(path);
 
     if (_.isFunction(req) && !module) {
-        if (options.verbose) console.log(options.PREFIX, "loading module", name, from, path);
-        inject(options, req, name).then(deferred.resolve);
+        if (this.verbose) console.log(this.PREFIX, "loading module", name, from, path);
+        this.inject(req, name).then(deferred.resolve);
     } else {
-        if (options.verbose) console.log(options.PREFIX, "defined module", name, from, path);
+        if (this.verbose) console.log(this.PREFIX, "defined module", name, from, path);
         deferred.resolve(req);
     }
 
     return deferred.promise;
 }
 
-function load_module(options, file, override) {
+Majic.prototype.load_module = function(file, override) {
     return new q(function(resolve, reject) {
         fs.stat(file, function(err, stats) {
             if (err) { return reject(err); }
@@ -93,34 +88,34 @@ function load_module(options, file, override) {
             var path = file.split("/");
             var name = path[path.length-1].split('.')[0]
 
-            if (stats.isFile() && !_.contains(options.exclude, name)) {
-                crequire(options, name, file, false, override);
+            if (stats.isFile() && !_.contains(this.exclude, name)) {
+                this.crequire(name, file, false, override);
             }
             resolve(true);
-        });
-    });
+        }.bind(this));
+    }.bind(this));
 }
 
-function scan(options, globs, override) {
+Majic.prototype.scan_paths = function(globs, override) {
     return q.all(_.map(globs, function(pattern) {
         return new q(function(resolve, reject) {
-            var path = options.root+"/"+pattern
-            if (options.verbose) console.log(options.PREFIX, "scanning path", path, "for modules")
+            var path = this.root+"/"+pattern
+            if (this.verbose) console.log(this.PREFIX, "scanning path", path, "for modules")
             glob(path, function(err, files) {
                 if (err) { return reject(err); }
                 q.all(_.map(files, function(f) {
-                    return load_module(options, f, override);
-                })).then(resolve, reject);
-            });
-        });
-    }));
+                    return this.load_module(f, override);
+                }.bind(this))).then(resolve, reject);
+            }.bind(this));
+        }.bind(this));
+    }.bind(this)));
 }
 
-function dependencies(options, dependencies) {
+Majic.prototype.dependencies = function(dependencies) {
     _.each(dependencies, function (version, name) {
-        if (name == 'majic') { return; }
+        if (name == 'Majic') { return; }
 
-        resolved = crequire(options, name, name, true);
+        resolved = this.crequire(name, name, true);
 
         if (name == "coffee-script") {
             require('coffee-script/register');
@@ -128,45 +123,45 @@ function dependencies(options, dependencies) {
 
         if (name == "chai") {
             resolved.then(function (chai) {
-                declare(options, 'expect').resolve(chai.expect);
-            });
+                this.declare('expect').resolve(chai.expect);
+            }.bind(this));
         }
-    });
+    }.bind(this));
 }
 
-function init(options) {
-    alias(options, 'bluebird', 'q');
-    alias(options, 'lodash', '_');
-    alias(options, 'underscore', '_');
+Majic.prototype.init = function() {
+    this.alias('bluebird', 'q');
+    this.alias('lodash', '_');
+    this.alias('underscore', '_');
 
-    options.package = require(options.root+'/package.json');
+    this.package = require(this.root+'/package.json');
 
-    if (options.package.dependencies) { dependencies(options, options.package.dependencies); }
-    if (!options.package.cio) { options.package.cio = {} };
+    if (this.package.dependencies) { this.dependencies(this.package.dependencies); }
+    if (!this.package.cio) { this.package.cio = {} };
 
-    return scan(options, options.package.cio.scan || options.scan);
+    return this.scan_paths(this.package.cio.scan || this.scan);
+}
+
+Majic.prototype.start = function() {
+    this.ready.resolve();
+    return this.ready.promise;
 }
 
 function start(opts) {
-    opts = options(opts);
-    return init(opts).then(opts.ready.resolve);
+    var majic = new Majic(opts);
+    return majic.init().then(majic.start.bind(majic));
 }
 
 function test(opts) {
-    opts = options(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
+    var majic = new Majic(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
 
-    init(opts).then(function() {
-        if (opts.package.devDependencies) { dependencies(opts, opts.package.devDependencies); }
-
-        return scan(opts, [ "test/mock/**" ], true).then(function() {
-            opts.ready.resolve();
-        });
+    majic.init().then(function() {
+        if (majic.package.devDependencies) { majic.dependencies(majic.package.devDependencies); }
+        return majic.scan_paths([ "test/mock/**" ], true).then(majic.start.bind(majic));
     });
 
-
-
     return function(fn) {
-        return function() { return inject(opts, fn, "injected test"); }
+        return function() { return majic.inject(fn, "injected test"); }
     }
 }
 
