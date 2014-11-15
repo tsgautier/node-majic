@@ -3,17 +3,17 @@ var _ = require('lodash'),
     fs = require('fs'),
     glob = require('glob'),
     introspect = require('introspect'),
-    TimeoutError = q.TimeoutError,
-    container = {};
+    TimeoutError = q.TimeoutError;
 
-var PREFIX = "majic:"
+var PREFIX = "majic:";
+var container = {};
 
 function defer() {
     var resolve, reject;
     var promise = new q(function() {
         resolve = arguments[0];
         reject = arguments[1];
-    })
+    });
 
     return {
         resolve: resolve,
@@ -86,9 +86,8 @@ module.exports = {
         alias('bluebird', 'q');
         alias('lodash', '_');
         alias('underscore', '_');
-        
+
         var package = require(root+'/package.json');
-        console.log(root);
 
         if (package.dependencies) {
             _.each(package.dependencies, function (version, name) {
