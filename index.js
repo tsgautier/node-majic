@@ -5,8 +5,18 @@ var _ = require('lodash'),
     introspect = require('introspect'),
     TimeoutError = q.TimeoutError;
 
-var PREFIX = "majic:";
-var container = {};
+function options(opts, defs) {
+    if (!_.isObject(opts)) opts = { root: opts };
+
+    return _.defaults(opts, defs, {
+        PREFIX: "majic:",
+        ready: defer(),
+        container: {},
+        root: __dirname,
+        verbose: true,
+        scan: [ "config/**", "src/lib/**", "src/main/**" ]
+    });
+}
 
 function defer() {
     var resolve, reject;
@@ -22,95 +32,145 @@ function defer() {
     };
 }
 
-function declare(name, timeout) {
-    var v = container[name];
+function declare(options, name, timeout, override) {
+    var v = override ? undefined : options.container[name];
     if (!v) {
-        container[name] = v = defer();
+        options.container[name] = v = defer();
         if (timeout) {
             v.promise.timeout(timeout).catch(TimeoutError, function() {
-                console.warn(PREFIX, "timeout resolving " + name);
+                if (options.verbose) console.warn(options.PREFIX, "timeout resolving " + name);
             });
         }
     }
     return v;
 }
 
-function resolve(name, timeout) {
-    return declare(name, timeout).promise;
+function resolve(options, name, timeout) {
+    return declare(options, name, timeout).promise;
 }
 
-function alias(src, dst) {
-    resolve(src).then(function(v) {
-        console.log(PREFIX, "aliased module", dst, "from", src);
-        declare(dst).resolve(v);
+function alias(options, src, dst) {
+    resolve(options, src).then(function(v) {
+        if (options.verbose) console.log(options.PREFIX, "aliased module", dst, "from", src);
+        declare(options, dst).resolve(v);
     });
 }
 
-function crequire(name, path, module) {
+function inject(options, fn, name) {
+    var params = introspect(fn);
+
+    return options.ready.promise.then(function() {
+        return q.all(_.map(params, function(p) { return resolve(options, p, 2000) })).then(function(args) {
+            if (options.verbose && name) console.log(options.PREFIX, "resolving module", name, "with args", params);
+            return fn.apply(null, args);
+        });
+    });
+}
+
+function crequire(options, name, path, module, override) {
     name = name.replace(/\-/gi, '_');
 
-    var deferred = declare(name, module ? undefined : 2000);
+    var from = module ? "from npm" : "from"
+    var deferred = declare(options, name, module ? undefined : 2000, override);
     var req = require(path);
 
     if (_.isFunction(req) && !module) {
-        console.log(PREFIX, "loading module", name, "from", path);
-        var params = introspect(req);
-
-        q.all(_.map(params, function(p) { return resolve(p, 2000) })).then(function(args) {
-            console.log(PREFIX, "resolving module", name, "with args", params);
-            deferred.resolve(req.apply(null, args));
-        });
+        if (options.verbose) console.log(options.PREFIX, "loading module", name, from, path);
+        inject(options, req, name).then(deferred.resolve);
     } else {
-        console.log(PREFIX, "defined module", name, "from npm", path);
+        if (options.verbose) console.log(options.PREFIX, "defined module", name, from, path);
         deferred.resolve(req);
     }
+
+    return deferred.promise;
 }
 
-function inject(file) {
-    fs.stat(file, function(err, stats) {
-        if (err) { return console.error(err); }
+function load_module(options, file, override) {
+    return new q(function(resolve, reject) {
+        fs.stat(file, function(err, stats) {
+            if (err) { return reject(err); }
 
-        if (stats.isFile()) {
             var path = file.split("/");
             var name = path[path.length-1].split('.')[0]
-            crequire(name, file);
+
+            if (stats.isFile() && !_.contains(options.exclude, name)) {
+                crequire(options, name, file, false, override);
+            }
+            resolve(true);
+        });
+    });
+}
+
+function scan(options, globs, override) {
+    return q.all(_.map(globs, function(pattern) {
+        return new q(function(resolve, reject) {
+            var path = options.root+"/"+pattern
+            if (options.verbose) console.log(options.PREFIX, "scanning path", path, "for modules")
+            glob(path, function(err, files) {
+                if (err) { return reject(err); }
+                q.all(_.map(files, function(f) {
+                    return load_module(options, f, override);
+                })).then(resolve, reject);
+            });
+        });
+    }));
+}
+
+function dependencies(options, dependencies) {
+    _.each(dependencies, function (version, name) {
+        if (name == 'majic') { return; }
+
+        resolved = crequire(options, name, name, true);
+
+        if (name == "coffee-script") {
+            require('coffee-script/register');
+        }
+
+        if (name == "chai") {
+            resolved.then(function (chai) {
+                declare(options, 'expect').resolve(chai.expect);
+            });
         }
     });
+}
 
+function init(options) {
+    alias(options, 'bluebird', 'q');
+    alias(options, 'lodash', '_');
+    alias(options, 'underscore', '_');
+
+    options.package = require(options.root+'/package.json');
+
+    if (options.package.dependencies) { dependencies(options, options.package.dependencies); }
+    if (!options.package.cio) { options.package.cio = {} };
+
+    return scan(options, options.package.cio.scan || options.scan);
+}
+
+function start(opts) {
+    opts = options(opts);
+    return init(opts).then(opts.ready.resolve);
+}
+
+function test(opts) {
+    opts = options(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
+
+    init(opts).then(function() {
+        if (opts.package.devDependencies) { dependencies(opts, opts.package.devDependencies); }
+
+        return scan(opts, [ "test/mock/**" ], true).then(function() {
+            opts.ready.resolve();
+        });
+    });
+
+
+
+    return function(fn) {
+        return function() { return inject(opts, fn, "injected test"); }
+    }
 }
 
 module.exports = {
-    start: function(root) {
-        if (!root) { root = __dirname; }
-
-        alias('bluebird', 'q');
-        alias('lodash', '_');
-        alias('underscore', '_');
-
-        var package = require(root+'/package.json');
-
-        if (package.dependencies) {
-            _.each(package.dependencies, function (version, name) {
-                if (name == 'majic') { return; }
-
-                crequire(name, name, true);
-
-                if (name == "coffee-script") {
-                    require('coffee-script/register');
-                }
-            });
-        }
-
-        if (!package.cio) { package.cio = {} };
-        if (!package.cio.scan) { package.cio.scan = [ "config/**", "src/**" ]; }
-
-        _.each(package.cio.scan, function(pattern) {
-            var path = root+"/"+pattern
-            console.log(PREFIX, "scanning path", path, "for modules")
-            glob(path, function(err, files) {
-                if (err) { return console.error(er); }
-                _.each(files, inject)
-            });
-        });
-    }
+    start: start,
+    test: test
 }
