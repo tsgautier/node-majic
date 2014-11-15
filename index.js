@@ -147,25 +147,21 @@ Majic.prototype.start = function() {
     return this.ready.promise;
 }
 
-function start(opts) {
-    var majic = new Majic(opts);
-    return majic.init().then(majic.start.bind(majic));
-}
-
-function test(opts) {
-    var majic = new Majic(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
-
-    majic.init().then(function() {
-        if (majic.package.devDependencies) { majic.dependencies(majic.package.devDependencies); }
-        return majic.scan_paths([ "test/mock/**" ], true).then(majic.start.bind(majic));
-    });
-
-    return function(fn) {
-        return function() { return majic.inject(fn, "injected test"); }
-    }
-}
-
 module.exports = {
-    start: start,
-    test: test
+    start: function (opts) {
+        var majic = new Majic(opts);
+        return majic.init().then(majic.start.bind(majic));
+    },
+    test: function test(opts) {
+        var majic = new Majic(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
+
+        majic.init().then(function() {
+            if (majic.package.devDependencies) { majic.dependencies(majic.package.devDependencies); }
+            return majic.scan_paths([ "test/mock/**" ], true).then(majic.start.bind(majic));
+        });
+
+        return function(fn) {
+            return function() { return majic.inject(fn, "injected test"); }
+        }
+    }
 }
