@@ -13,6 +13,55 @@ bootstrap majic in one simple line:
 require('majic').start();
 ```
 
+if you make this the contents of your server.js file, then you can run your app as simply as:
+
+```
+$ npm start
+```
+
+## bootstrap a majic app
+
+Step 1: initialize your application directory
+
+```
+$ npm init
+```
+
+Step 2: install majic
+
+```
+$ npm install --save majic
+```
+
+Step 3: setup some files
+
+./server.js
+
+```javascript
+require('majic').start();
+```
+
+./src/helloworld.js
+
+```javascript
+module.exports = function() {
+    console.log("Hello World!");
+}
+```
+
+Step 4: run it
+
+```
+$ npm start
+
+majic: defined module majic from npm majic
+majic: scanning path ./config/** for modules
+majic: scanning path ./src/** for modules
+majic: loading module helloworld from ./src/helloworld.js
+majic: resolving module helloworld with args []
+Hello World!
+```
+
 ## automatic package.json inclusion
 majic will autoscan and require all dependencies declared in your package.json.
 
