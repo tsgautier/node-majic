@@ -1,26 +1,81 @@
-majic
-=====
+# majic
 
 A mini ioc container for node/javascript.
 
 majic is an opinionated ioc container that uses promises and directory
-scanning to make bootstrapping your application simple.
+scanning to make bootstrapping your application drop dead simple.
+
+## how to use
 
 bootstrap majic in one simple line:
-``` javascript
+
+```javascript
 require('majic').start();
+```
 
-majic will autoscan and require all dependencies declared in your package.json
-dependencies section.
+## automatic package.json inclusion
+majic will autoscan and require all dependencies declared in your package.json.
 
-it will autoscan any files in the __dirname/config directory and it will
-autoscan any files in the __dirname/src directory.
+example: ./package.json
 
-if you declare a function as your module.exports, majic will automatically
-detect the names of the function arguments, and inject them for you.  
+```js
+{
+    depenencies: {
+        "bluebird": "*",
+        "lodash": "*",
+        "some-package": "*"
+    }
+}
+```
 
-this is done using promises, so your modules will run as soon as the
-dependencies for your module are available.
+the above example would automatically require and make the bluebird, lodash and some-package libraries available.
 
-if you return a promise from your module, the resolved value (when ready)
-will be used as the injetable value.
+### name-mangling
+
+since package naming conventions allow characters that are not allowed in javascript variable naming syntax, majic will automatically convert illegal characters to the underscore ('_') character.
+
+in the above example, some-package would be available to your modules as "some_package".
+
+## automajic source scanning
+after that it will autoscan any files in the ./config and ./src directories (this is configurable).
+
+due to the asynchronous and promise based dependency chains, your application will start in whatever order your dependencies are available, as fast as they are available.
+
+## native coffee support
+
+majic natively supports coffee-script. if you put coffee-script as a dependency in your package.json, majic will bootstrap coffee and register it automajically.
+
+## module naming
+
+the name of your modules will be determined from the filename of your module, less the extension, so for example the module located at ./config/myconfig.coffee would be named 'myconfig'.
+
+## declaring static modules
+
+you can declare static values simply by exporting them via module.exports.  this is a good idea for configuration files, which you might want to put into the config directory.
+
+example: ./config/myconfig.coffee
+
+```
+module.exports =
+    host: 'localhost'
+    port: '8080'
+```
+
+## declaring dynamic modules
+
+you can declare modules which have dependencies injected by exporting a function rather than a static object.
+
+example: ./src/myapp.coffee
+
+```
+module.exports = (myconfig) ->
+    console.log "app will start on #{myconfig.host} and port #{myconfig.port}"
+```
+
+the function exported in module.exports will only be executed once all the dependencies it declares are resolved.
+
+the value your function returns is what will be injected into other callers.
+
+## native promise support
+
+if you return a promise from your module, the resolved value (when ready) will be used as the injectable value.
