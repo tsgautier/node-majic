@@ -10,7 +10,7 @@ scanning to make bootstrapping your application drop dead simple.
 bootstrap majic in one simple line:
 
 ```javascript
-require('majic').start();
+require('majic').start(__dirname);
 ```
 
 if you make this the contents of your server.js file, then you can run your app as simply as:
@@ -38,7 +38,7 @@ Step 3: setup some files
 ./server.js
 
 ```javascript
-require('majic').start();
+require('majic').start(__dirname);
 ```
 
 ./src/helloworld.js
