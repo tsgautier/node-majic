@@ -1,0 +1,20 @@
+{
+  "name": "majic",
+  "version": "0.0.1",
+  "description": "micro awesome javascript ioc",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Taylor Gautier",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tsgautier/node-majic.git"
+  },
+  "dependencies": {
+    "bluebird": "^2.3.11",
+    "glob": "^4.0.6",
+    "introspect": "0.0.3"
+  }
+}
