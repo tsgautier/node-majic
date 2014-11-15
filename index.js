@@ -3,7 +3,6 @@ var _ = require('lodash'),
     fs = require('fs'),
     glob = require('glob'),
     introspect = require('introspect'),
-    package = require(__dirname + '/../../package.json'),
     TimeoutError = q.TimeoutError,
     container = {};
 
@@ -23,19 +22,21 @@ function defer() {
     };
 }
 
-function declare(name) {
+function declare(name, timeout) {
     var v = container[name];
     if (!v) {
         container[name] = v = defer();
-        v.promise.timeout(2000).catch(TimeoutError, function() {
-            console.warn(PREFIX, "timeout resolving " + name);
-        });
+        if (timeout) {
+            v.promise.timeout(timeout).catch(TimeoutError, function() {
+                console.warn(PREFIX, "timeout resolving " + name);
+            });
+        }
     }
     return v;
 }
 
-function resolve(name) {
-    return declare(name).promise;
+function resolve(name, timeout) {
+    return declare(name, timeout).promise;
 }
 
 function alias(src, dst) {
@@ -48,14 +49,14 @@ function alias(src, dst) {
 function crequire(name, path, module) {
     name = name.replace(/\-/gi, '_');
 
-    var deferred = declare(name);
+    var deferred = declare(name, module ? undefined : 2000);
     var req = require(path);
 
     if (_.isFunction(req) && !module) {
         console.log(PREFIX, "loading module", name, "from", path);
         var params = introspect(req);
 
-        q.all(_.map(params, resolve)).then(function(args) {
+        q.all(_.map(params, function(p) { return resolve(p, 2000) })).then(function(args) {
             console.log(PREFIX, "resolving module", name, "with args", params);
             deferred.resolve(req.apply(null, args));
         });
@@ -79,12 +80,20 @@ function inject(file) {
 }
 
 module.exports = {
-    start: function() {
+    start: function(root) {
+        if (!root) { root = __dirname; }
+
         alias('bluebird', 'q');
         alias('lodash', '_');
+        alias('underscore', '_');
+        
+        var package = require(root+'/package.json');
+        console.log(root);
 
         if (package.dependencies) {
             _.each(package.dependencies, function (version, name) {
+                if (name == 'majic') { return; }
+
                 crequire(name, name, true);
 
                 if (name == "coffee-script") {
@@ -97,7 +106,7 @@ module.exports = {
         if (!package.cio.scan) { package.cio.scan = [ "config/**", "src/**" ]; }
 
         _.each(package.cio.scan, function(pattern) {
-            var path = __dirname+"/../../"+pattern
+            var path = root+"/"+pattern
             console.log(PREFIX, "scanning path", path, "for modules")
             glob(path, function(err, files) {
                 if (err) { return console.error(er); }

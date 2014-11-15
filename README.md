@@ -79,11 +79,19 @@ example: ./package.json
 
 the above example would automatically require and make the bluebird, lodash and some-package libraries available.
 
-### name-mangling
+#### name-mangling
 
 since package naming conventions allow characters that are not allowed in javascript variable naming syntax, majic will automatically convert illegal characters to the underscore ('_') character.
 
 in the above example, some-package would be available to your modules as "some_package".
+
+#### automajic aliases
+
+majic will automajically alias common libraries for you.  the common aliases are listed below
+
+* bluebird: 'q'
+* underscore: '_'
+* lodash: '_'
 
 ## automajic source scanning
 after that it will autoscan any files in the ./config and ./src directories (this is configurable).
