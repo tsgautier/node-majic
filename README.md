@@ -54,7 +54,6 @@ Step 4: run it
 ```
 $ npm start
 
-majic: defined module majic from npm majic
 majic: scanning path ./config/** for modules
 majic: scanning path ./src/** for modules
 majic: loading module helloworld from ./src/helloworld.js
