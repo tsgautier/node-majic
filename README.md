@@ -83,11 +83,11 @@ The above example would automatically require and make the bluebird, lodash and 
 
 Since package naming conventions allow characters that are not allowed in javascript variable naming syntax, majic will automatically convert illegal characters to the underscore ('_') character.
 
-Nn the above example, some-package would be available to your modules as "some_package".
+In the above example, some-package would be available to your modules as "some_package".
 
 #### Automajic aliases
 
-Majic will automajically alias common libraries for you.  the common aliases are listed below
+Majic will automajically alias common libraries for you.  the common aliases are listed below:
 
 * bluebird: 'q'
 * underscore: '_'
@@ -161,6 +161,8 @@ describe 'logger', ->
         expect(winston.mock).to.equal(true);
 ```
 
+The result of the inject method is a promise, so you will need a unit testing library that supports promises, such as [Mocha](https://github.com/mochajs/mocha), to use majic testing.
+
 ## Automatic devDependency inclusion
 
 During test execution, after scanning the dependencies in your package.json like in the regular startup sequence for majic, the test startup sequence will automatically scan the devDependencies section of your package.json.
@@ -171,9 +173,7 @@ If you declare [Chai](http://chaijs.com/) as a devDependency, majic will automat
 
 ## Automatic mock inclusion
 
-After scanning your components, Majic will autoscan the directory "/test/mock" for mocks.
-
-*Note: this strategy will likely need some improvement to make it more targeted at the specific needs of each test*
+After scanning your components, Majic will autoscan the directory "./test/mock" for mocks to allow mocks the ability to override components.
 
 ## Recommended setup
 
