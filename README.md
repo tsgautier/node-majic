@@ -19,29 +19,29 @@ if you make this the contents of your server.js file, then you can run your app 
 $ npm start
 ```
 
-## Bootstrap a majic app
+## Generate a majic app
 
-Step 1: initialize your application directory
+**Step 1: initialize your application directory**
 
 ```
-$ npm init
+$ mkdir myapp; cd myapp; npm init
 ```
 
-Step 2: install majic
+**Step 2: install majic**
 
 ```
 $ npm install --save majic
 ```
 
-Step 3: setup some files
+**Step 3: setup some files**
 
-./server.js
+*./server.js*
 
 ```javascript
 require('majic').start(__dirname);
 ```
 
-./src/main/helloworld.js
+*./src/main/helloworld.js*
 
 ```javascript
 module.exports = function() {
@@ -49,7 +49,7 @@ module.exports = function() {
 }
 ```
 
-Step 4: run it
+**Step 4: run it**
 
 ```
 $ npm start
