@@ -54,11 +54,10 @@ Step 4: run it
 ```
 $ npm start
 
+majic: scanning path ./config/** for modules
 majic: scanning path ./src/lib/** for modules
 majic: scanning path ./src/main/** for modules
-majic: aliased module q from bluebird
-majic: aliased module _ from lodash
-majic: loading module helloworld from ./src/lib/helloworld.js
+majic: loading module helloworld from ./src/main/helloworld.js
 majic: resolving module helloworld with args []
 Hello World!
 ```
