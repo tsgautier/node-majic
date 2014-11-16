@@ -1,6 +1,6 @@
 {
   "name": "majic",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "an opinionated micro javascript/node.js ioc container that uses promises and auto-discovery",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
