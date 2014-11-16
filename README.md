@@ -167,9 +167,11 @@ The result of the inject method is a promise, so you will need a unit testing li
 
 During test execution, after scanning the dependencies in your package.json like in the regular startup sequence for majic, the test startup sequence will automatically scan the devDependencies section of your package.json.
 
-## Expect
+## Automatic Chai expect and chai-as-promised support
 
 If you declare [Chai](http://chaijs.com/) as a devDependency, majic will automatically declare an 'expect' alias to the Chai.expect library.
+
+If you declare [chai-as-promised)(http://chaijs.com/plugins/chai-as-promised) then majic will automatically configure chai to use it.
 
 ## Automatic mock inclusion
 
@@ -186,7 +188,8 @@ To set this up, your package.json should have the following entries:
 {
   "devDependencies": {
     "mocha": "^2.0.1",
-    "chai": "^1.10.0"
+    "chai": "^1.10.0",
+    "chai-as-promised": "^4.1.1"
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test/unit"

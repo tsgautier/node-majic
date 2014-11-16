@@ -112,21 +112,30 @@ Majic.prototype.scan_paths = function(globs, override) {
 }
 
 Majic.prototype.dependencies = function(dependencies) {
-    _.each(dependencies, function (version, name) {
+    return q.all(_.map(dependencies, function (version, name) {
         if (name == 'Majic') { return; }
 
-        resolved = this.crequire(name, name, true);
+        var resolved = this.crequire(name, name, true);
+        var done = [ resolved ];
 
         if (name == "coffee-script") {
             require('coffee-script/register');
         }
 
         if (name == "chai") {
-            resolved.then(function (chai) {
+            done.push(resolved.then(function (chai) {
                 this.declare('expect').resolve(chai.expect);
-            }.bind(this));
+            }.bind(this)));
         }
-    }.bind(this));
+
+        if (name == "chai-as-promised") {
+            done.push(q.all([this.resolve("chai"), resolved]).spread(function (chai, p) {
+                chai.use(p);
+            }));
+        }
+
+        return q.all(done);
+    }.bind(this)));
 }
 
 Majic.prototype.init = function() {
@@ -136,10 +145,16 @@ Majic.prototype.init = function() {
 
     this.package = require(this.root+'/package.json');
 
-    if (this.package.dependencies) { this.dependencies(this.package.dependencies); }
-
-    if (!this.package.cio) { this.package.cio = {} };
-    return this.scan_paths(this.package.cio.scan || this.scan);
+    return new q(function (resolve) {
+        if (this.package.dependencies) {
+            resolve(this.dependencies(this.package.dependencies));
+        } else {
+            resolve(undefined);
+        }
+    }.bind(this)).then(function () {
+        if (!this.package.cio) { this.package.cio = {} };
+        return this.scan_paths(this.package.cio.scan || this.scan);
+    }.bind(this));
 }
 
 Majic.prototype.start = function() {
@@ -156,8 +171,15 @@ module.exports = {
         var majic = new Majic(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
 
         majic.init().then(function() {
-            if (majic.package.devDependencies) { majic.dependencies(majic.package.devDependencies); }
-            return majic.scan_paths([ "test/mock/**" ], true).then(majic.start.bind(majic));
+            return new q(function (resolve) {
+                if (majic.package.devDependencies) {
+                    resolve(majic.dependencies(majic.package.devDependencies));
+                } else {
+                    resolve(undefined);
+                }
+            }).then(function () {
+                return majic.scan_paths([ "test/mock/**" ], true).then(majic.start.bind(majic));
+            });
         });
 
         return function(fn) {
