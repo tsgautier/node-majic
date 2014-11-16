@@ -1,13 +1,13 @@
-# majic
+# Majic
 
 A mini ioc container for node/javascript.
 
-majic is an opinionated ioc container that uses promises and directory
-scanning to make bootstrapping your application drop dead simple.
+Majic is an opinionated ioc container that uses promises and directory
+scanning to make modularizing, running, and testing your application drop dead simple.
 
-## how to use
+## How to use
 
-bootstrap majic in one simple line:
+Bootstrap majic in one simple line:
 
 ```javascript
 require('majic').start(__dirname);
@@ -19,7 +19,7 @@ if you make this the contents of your server.js file, then you can run your app 
 $ npm start
 ```
 
-## bootstrap a majic app
+## Bootstrap a majic app
 
 Step 1: initialize your application directory
 
@@ -41,7 +41,7 @@ Step 3: setup some files
 require('majic').start(__dirname);
 ```
 
-./src/helloworld.js
+./src/main/helloworld.js
 
 ```javascript
 module.exports = function() {
@@ -54,17 +54,19 @@ Step 4: run it
 ```
 $ npm start
 
-majic: scanning path ./config/** for modules
-majic: scanning path ./src/** for modules
-majic: loading module helloworld from ./src/helloworld.js
+majic: scanning path ./src/lib/** for modules
+majic: scanning path ./src/main/** for modules
+majic: aliased module q from bluebird
+majic: aliased module _ from lodash
+majic: loading module helloworld from ./src/lib/helloworld.js
 majic: resolving module helloworld with args []
 Hello World!
 ```
 
-## automatic package.json inclusion
-majic will autoscan and require all dependencies declared in your package.json.
+## Automatic package.json inclusion
+Majic will autoscan and require all dependencies declared in your package.json.
 
-example: ./package.json
+**Example: ./package.json**
 
 ```js
 {
@@ -76,40 +78,40 @@ example: ./package.json
 }
 ```
 
-the above example would automatically require and make the bluebird, lodash and some-package libraries available.
+The above example would automatically require and make the bluebird, lodash and some-package libraries available.
 
-#### name-mangling
+#### Name mangling
 
-since package naming conventions allow characters that are not allowed in javascript variable naming syntax, majic will automatically convert illegal characters to the underscore ('_') character.
+Since package naming conventions allow characters that are not allowed in javascript variable naming syntax, majic will automatically convert illegal characters to the underscore ('_') character.
 
-in the above example, some-package would be available to your modules as "some_package".
+Nn the above example, some-package would be available to your modules as "some_package".
 
-#### automajic aliases
+#### Automajic aliases
 
-majic will automajically alias common libraries for you.  the common aliases are listed below
+Majic will automajically alias common libraries for you.  the common aliases are listed below
 
 * bluebird: 'q'
 * underscore: '_'
 * lodash: '_'
 
-## automajic source scanning
-after that it will autoscan any files in the ./config and ./src directories (this is configurable).
+## Automajic source scanning
+After including dependencies from package.json, majic will will autoscan any files in the ./config, ./src/lib and ./src/main directories (this is configurable).
 
-due to the asynchronous and promise based dependency chains, your application will start in whatever order your dependencies are available, as fast as they are available.
+Due to the asynchronous and promise based dependency chains, your application will start in whatever order your dependencies are available, as fast as they are available.
 
-## native coffee support
+## Native coffee support
 
-majic natively supports coffee-script. if you put coffee-script as a dependency in your package.json, majic will bootstrap coffee and register it automajically.
+Majic natively supports coffee-script. If you put coffee-script as a dependency in your package.json, majic will bootstrap coffee and register it automajically.
 
-## module naming
+## Module naming
 
-the name of your modules will be determined from the filename of your module, less the extension, so for example the module located at ./config/myconfig.coffee would be named 'myconfig'.
+The name of your modules will be determined from the filename of your module, less the extension, so for example the module located at ./config/myconfig.coffee would be named 'myconfig'.
 
-## declaring static modules
+## Declaring static modules
 
-you can declare static values simply by exporting them via module.exports.  this is a good idea for configuration files, which you might want to put into the config directory.
+You can declare static values simply by exporting them via module.exports.  This is a good idea for configuration files, which you might want to put into the config directory.
 
-example: ./config/myconfig.coffee
+**Example: ./config/myconfig.coffee**
 
 ```
 module.exports =
@@ -117,21 +119,104 @@ module.exports =
     port: '8080'
 ```
 
-## declaring dynamic modules
+## Declaring dynamic modules
 
-you can declare modules which have dependencies injected by exporting a function rather than a static object.
+You can declare modules which have dependencies injected by exporting a function rather than a static object.
 
-example: ./src/myapp.coffee
+**Example: ./src/myapp.coffee**
 
 ```
 module.exports = (myconfig) ->
     console.log "app will start on #{myconfig.host} and port #{myconfig.port}"
 ```
 
-the function exported in module.exports will only be executed once all the dependencies it declares are resolved.
+The function exported in module.exports will only be executed once all the dependencies it declares are resolved.
 
-the value your function returns is what will be injected into other callers.
+The value your function returns is what will be injected into other callers.
 
-## native promise support
+## Native promise support
 
-if you return a promise from your module, the resolved value (when ready) will be used as the injectable value.
+If you return a promise from your module, the resolved value (when ready) will be used as the injectable value.
+
+## Module locations
+
+Majic scans both ./src/lib and ./src/main to allow you to declare modular non-executable components in ./src/lib and executable components in ./src/main.
+
+When testing, majic will only scan ./src/lib, so that your application will not start by default when testing.
+
+## Testing
+
+Majic makes testing your application easier by autoloading components and mocks.
+
+To test a component, using a framework such as [Mocha](https://github.com/mochajs/mocha), simply declare an instance of Majic via the test() method.
+
+Once this is done, the instance returned can inject parameters into your test methods, just like it can into dynamic module functions.
+
+**Example: ./test/unit/logger.coffee**
+
+```coffee-script
+describe 'logger', ->
+    inject = require('majic').test __dirname+'/../..'
+
+    it 'should inject a mock instance of winston', inject (expect, winston) ->
+        expect(winston.mock).to.equal(true);
+```
+
+## Automatic devDependency inclusion
+
+During test execution, after scanning the dependencies in your package.json like in the regular startup sequence for majic, the test startup sequence will automatically scan the devDependencies section of your package.json.
+
+## Expect
+
+If you declare [Chai](http://chaijs.com/) as a devDependency, majic will automatically declare an 'expect' alias to the Chai.expect library.
+
+## Automatic mock inclusion
+
+After scanning your components, Majic will autoscan the directory "/test/mock" for mocks.
+
+*Note: this strategy will likely need some improvement to make it more targeted at the specific needs of each test*
+
+## Recommended setup
+
+We recommend you use [Mocha](https://github.com/mochajs/mocha) as your test runner and Chai for expect.
+
+To set this up, your package.json should have the following entries:
+
+**Example: ./package.json**
+```json
+{
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "chai": "^1.10.0"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha test/unit"
+  }
+}
+```
+
+And setup your mocha installation for recursive scanning and nice reporting:
+
+**Example: ./test/mocha.opts**
+```
+-c
+-R spec
+--recursive
+--globals currentContext
+--compilers coffee:coffee-script/register
+```
+
+Now, place your unit tests in ./test/unit and your mocks in ./test/mock and majic will take care of the rest when you test it all with npm test:
+
+```
+$ npm test
+
+> @ test
+> ./node_modules/mocha/bin/mocha test/unit
+
+  logger
+    ✓ should inject a mock instance of winston
+
+
+  1 passing (83ms)
+```

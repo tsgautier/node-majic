@@ -137,8 +137,8 @@ Majic.prototype.init = function() {
     this.package = require(this.root+'/package.json');
 
     if (this.package.dependencies) { this.dependencies(this.package.dependencies); }
-    if (!this.package.cio) { this.package.cio = {} };
 
+    if (!this.package.cio) { this.package.cio = {} };
     return this.scan_paths(this.package.cio.scan || this.scan);
 }
 
