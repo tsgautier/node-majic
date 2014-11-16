@@ -1,22 +1,37 @@
 # Majic
 
-A mini ioc container for node/javascript.
+A micro javascript/node.js ioc dependency injection container that uses promises and auto-discovery.
 
-Majic is an opinionated ioc container that uses promises and directory
-scanning to make modularizing, running, and testing your application drop dead simple.
+Majic uses Angular style dependency injection, automatic source directory scanning, and promised based asynchronous module loading to make modularizing, running, and testing your application drop dead simple.
+
+Out of the box, majic supports convention based configuration to make application modularization and startup a snap - no boilerplate required!  It also supports unit testing via a simple injection method and component overrides to make declaring and using mocks easy.
 
 ## How to use
 
-Bootstrap majic in one simple line:
+Bootstrap majic in one simple line by declaring it as the npm start script in your *package.json* file:
 
 ```javascript
-require('majic').start(__dirname);
+{
+    "dependencies": {
+        "majic": "0.0.10"
+    },
+    "scripts": {
+        "start": "./node_modules/majic/bin/majic"
+    }
+}
 ```
 
-if you make this the contents of your server.js file, then you can run your app as simply as:
+Then you can run your app as simply as:
 
 ```
 $ npm start
+```
+
+Alternatively, you can create a server.js file and leave out the *package.json* start script declaration like so:
+
+*server.js*
+``` javascript
+require('majic').start(__dirname);
 ```
 
 ## Generate a majic app
@@ -69,15 +84,16 @@ Majic will autoscan and require all dependencies declared in your package.json.
 
 ```js
 {
-    depenencies: {
-        "bluebird": "*",
-        "lodash": "*",
-        "some-package": "*"
+    "dependencies": {
+        "bluebird": "^2.3.2",
+        "lodash": "^2.4.1",
+        "majic": "0.0.10",
+        "express": "^4.10.2"
     }
 }
 ```
 
-The above example would automatically require and make the bluebird, lodash and some-package libraries available.
+The above example would automatically require the bluebird, lodash, majic, and express libraries available (by name) for dependency injection.
 
 #### Name mangling
 
@@ -167,15 +183,15 @@ The result of the inject method is a promise, so you will need a unit testing li
 
 During test execution, after scanning the dependencies in your package.json like in the regular startup sequence for majic, the test startup sequence will automatically scan the devDependencies section of your package.json.
 
-## Automatic Chai expect and chai-as-promised support
+## Chai expect and chai-as-promised support
 
 If you declare [Chai](http://chaijs.com/) as a devDependency, majic will automatically declare an 'expect' alias to the Chai.expect library.
 
-If you declare [chai-as-promised)(http://chaijs.com/plugins/chai-as-promised) then majic will automatically configure chai to use it.
+If you declare [chai-as-promised](http://chaijs.com/plugins/chai-as-promised) then majic will automatically configure chai to use it.
 
 ## Automatic mock inclusion
 
-After scanning your components, Majic will autoscan the directory "./test/mock" for mocks to allow mocks the ability to override components.
+After scanning your components, Majic will autoscan the directory "./test/mock" for mocks to allow mocks the ability to override previously defined components.
 
 ## Recommended setup
 
