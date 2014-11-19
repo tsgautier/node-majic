@@ -31,7 +31,7 @@ Alternatively, you can create a server.js file and leave out the *package.json* 
 
 *server.js*
 ``` javascript
-require('majic').start(__dirname);
+require('majic').start();
 ```
 
 ## Generate a majic app
@@ -53,7 +53,7 @@ $ npm install --save majic
 *./server.js*
 
 ```javascript
-require('majic').start(__dirname);
+require('majic').start();
 ```
 
 *./src/main/helloworld.js*
@@ -171,7 +171,7 @@ Once this is done, the instance returned can inject parameters into your test me
 
 ```coffee-script
 describe 'logger', ->
-    inject = require('majic').test __dirname+'/../..'
+    inject = require('majic').test()
 
     it 'should inject a mock instance of winston', inject (expect, winston) ->
         expect(winston.mock).to.equal(true);

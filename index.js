@@ -3,6 +3,7 @@ var _ = require('lodash'),
     fs = require('fs'),
     glob = require('glob'),
     introspect = require('introspect'),
+    appRootPath = require('app-root-path'),
     TimeoutError = q.TimeoutError;
 
 function defer() {
@@ -21,7 +22,7 @@ var Majic = function options(opts, defs) {
         PREFIX: "majic:",
         ready: defer(),
         container: {},
-        root: __dirname,
+        root: appRootPath,
         verbose: true,
         scan: [ "config/**", "src/lib/**", "src/main/**" ]
     });
