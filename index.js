@@ -1,3 +1,5 @@
+var TIMEOUT = 4000;
+
 var _ = require('lodash'),
     q = require('bluebird'),
     fs = require('fs'),
@@ -56,7 +58,7 @@ Majic.prototype.inject = function(fn, name) {
     var params = introspect(fn);
 
     return this.ready.promise.then(function() {
-        return q.all(_.map(params, function(p) { return this.resolve(p, 2000) }.bind(this))).then(function(args) {
+        return q.all(_.map(params, function(p) { return this.resolve(p, TIMEOUT) }.bind(this))).then(function(args) {
             if (this.verbose && name) console.log(this.PREFIX, "resolving module", name, "with args", params);
             return fn.apply(null, args);
         }.bind(this));
@@ -67,7 +69,7 @@ Majic.prototype.crequire = function(name, path, module, override) {
     name = name.replace(/\-/gi, '_');
 
     var from = module ? "from npm" : "from"
-    var deferred = this.declare(name, module ? undefined : 2000, override);
+    var deferred = this.declare(name, module ? undefined : TIMEOUT, override);
     var req = require(path);
 
     if (_.isFunction(req) && !module) {
@@ -105,6 +107,10 @@ Majic.prototype.scan_paths = function(globs, override) {
             glob(path, function(err, files) {
                 if (err) { return reject(err); }
                 q.all(_.map(files, function(f) {
+                    // hack for startup specifiers
+                    if (this.filter && pattern == 'src/main/**') {
+                        if (f.indexOf(this.filter) < 0) { return; }
+                    }
                     return this.load_module(f, override);
                 }.bind(this))).then(resolve, reject);
             }.bind(this));
@@ -143,8 +149,15 @@ Majic.prototype.init = function() {
     this.alias('bluebird', 'q');
     this.alias('lodash', '_');
     this.alias('underscore', '_');
+    this.declare('process').resolve(process);
+    this.declare('argv').resolve(process.argv);
 
     this.package = require(this.root+'/package.json');
+
+    // node dependencies
+    _.each(this.package.declare, function (dependency) {
+        this.declare(dependency).resolve(require(dependency));
+    }.bind(this));
 
     return new q(function (resolve) {
         if (this.package.dependencies) {
@@ -165,6 +178,8 @@ Majic.prototype.start = function() {
 
 module.exports = {
     start: function (opts) {
+        if (opts === null || opts === void(0)) { opts = {}; }
+        if (process.argv[2] !== null && process.argv[2] !== void(0)) opts.filter = process.argv[2]
         var majic = new Majic(opts);
         return majic.init().then(majic.start.bind(majic));
     },
