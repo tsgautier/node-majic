@@ -43,6 +43,11 @@ Majic.prototype.declare = function(name, timeout, override) {
     return v;
 }
 
+Majic.prototype.define = function(name, object) {
+    this.declare(name).resolve(object);
+    if (this.verbose) console.log(this.PREFIX, "defined module", name, "from global")
+}
+
 Majic.prototype.resolve = function(name, timeout) {
     return this.declare(name, timeout).promise;
 }
@@ -81,6 +86,11 @@ Majic.prototype.crequire = function(name, path, module, override) {
     }
 
     return deferred.promise;
+}
+
+Majic.prototype.nrequire = function(name) {
+    this.declare(name).resolve(require(name));
+    if (this.verbose) console.log(this.PREFIX, "defined module", name, "from node require");
 }
 
 Majic.prototype.load_module = function(file, override) {
@@ -149,14 +159,14 @@ Majic.prototype.init = function() {
     this.alias('bluebird', 'q');
     this.alias('lodash', '_');
     this.alias('underscore', '_');
-    this.declare('process').resolve(process);
-    this.declare('argv').resolve(process.argv);
+    this.define('process', process)
+    this.define('argv', process.argv);
 
     this.package = require(this.root+'/package.json');
 
     // node dependencies
     _.each(this.package.declare, function (dependency) {
-        this.declare(dependency).resolve(require(dependency));
+        this.nrequire(dependency);
     }.bind(this));
 
     return new q(function (resolve) {
