@@ -61,7 +61,7 @@ $ npm install --save majic
    ...
 ```
 
-Step 4: setup an application file
+**Step 4: setup an application file**
 
 *./src/main/config.js*
 ```javascript
@@ -77,7 +77,7 @@ module.exports = function() {
 }
 ```
 
-**Step 4: run it**
+**Step 5: run it**
 
 ```
 $ npm start
@@ -117,8 +117,9 @@ Majic automatically names dependencies, and injects them into module declaration
 module.exports = {
     "greeting: "Hello World!";
 }
+```
 
-And the *./src/main/helloworld.js* file to:
+And change the *./src/main/helloworld.js* file to:
 
 ```javascript
 module.exports = function(config) {
@@ -126,7 +127,22 @@ module.exports = function(config) {
 }
 ```
 
-Notice that the config file is auto-scanned and read automatically and is available for injecting into any other dependency which declares it as an argument.
+Then re-run the application.
+
+
+```
+$ npm start
+
+majic: scanning path ./config/** for modules
+majic: scanning path ./src/lib/** for modules
+majic: scanning path ./src/main/** for modules
+majic: defined module config from ./src/main/config.js
+majic: loading module helloworld from ./src/main/helloworld.js
+majic: resolving module helloworld with args [ 'config' ]
+Hello World!
+```
+
+Notice that the new config.js file was auto-scanned automatically injected into the helloworld component which declared it as a dependency.
 
 #### Name mangling
 
