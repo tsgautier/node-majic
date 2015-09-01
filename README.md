@@ -27,7 +27,7 @@ Then you can run your app as simply as:
 $ npm start
 ```
 
-Alternatively, you can create a server.js file and leave out the *package.json* start script declaration like so:
+Alternatively, you can bootstrap majic from any js file, e.g.:
 
 *server.js*
 ``` javascript
@@ -48,13 +48,26 @@ $ mkdir myapp; cd myapp; npm init
 $ npm install --save majic
 ```
 
-**Step 3: setup some files**
+**Step 3: setup package.json for running npm commands**
 
-*./server.js*
+*./package.json*
 
 ```javascript
-require('majic').start();
+   ...
+   "scripts": {
+       "start": "./node_modules/majic/bin/majic",
+       "test": "./node_modules/mocha/bin/mocha test/unit"
+   },
+   ...
 ```
+
+Step 4: setup an application file
+
+*./src/main/config.js*
+```javascript
+module.exports = {
+    "greeting: "Hello World!");
+}
 
 *./src/main/helloworld.js*
 
@@ -94,6 +107,26 @@ Majic will autoscan and require all dependencies declared in your package.json.
 ```
 
 The above example would automatically require the bluebird, lodash, majic, and express libraries available (by name) for dependency injection.
+
+#### Automatic dependency injection
+
+Majic automatically names dependencies, and injects them into module declarations (functions).  Try adding the following file:
+
+*./src/main/config.js*
+```javascript
+module.exports = {
+    "greeting: "Hello World!";
+}
+
+And the *./src/main/helloworld.js* file to:
+
+```javascript
+module.exports = function(config) {
+    console.log(config.greeting);
+}
+```
+
+Notice that the config file is auto-scanned and read automatically and is available for injecting into any other dependency which declares it as an argument.
 
 #### Name mangling
 
@@ -191,11 +224,11 @@ If you declare [chai-as-promised](http://chaijs.com/plugins/chai-as-promised) th
 
 ## Automatic mock inclusion
 
-After scanning your components, Majic will autoscan the directory "./test/mock" for mocks to allow mocks the ability to override previously defined components.
+During test execution, Majic will autoscan the directory "./test/mock" before scanning for components to allow for mocks override component definitions. 
 
 ## Recommended setup
 
-We recommend you use [Mocha](https://github.com/mochajs/mocha) as your test runner and Chai for expect.
+It is recommended to use [Mocha](https://github.com/mochajs/mocha) as your test runner and Chai for expect.
 
 To set this up, your package.json should have the following entries:
 

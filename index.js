@@ -74,7 +74,8 @@ Majic.prototype.crequire = function(name, path, module, override) {
     name = name.replace(/\-/gi, '_');
 
     var from = module ? "from npm" : "from"
-    var deferred = this.declare(name, module ? undefined : TIMEOUT, override);
+    if (this.container[name] && !override) { return this.container[name].promise; }
+    var deferred = this.declare(name, module ? undefined : TIMEOUT, false);
     var req = require(path);
 
     if (_.isFunction(req) && !module) {
@@ -132,7 +133,7 @@ Majic.prototype.dependencies = function(dependencies) {
     return q.all(_.map(dependencies, function (version, name) {
         if (name == 'Majic') { return; }
 
-        var resolved = this.crequire(name, name, true);
+        var resolved = this.crequire(name, name, true, true);
         var done = [ resolved ];
 
         if (name == "coffee-script") {
@@ -194,7 +195,7 @@ module.exports = {
         return majic.init().then(majic.start.bind(majic));
     },
     test: function test(opts) {
-        var majic = new Majic(opts, { scan: [ "config/**", "src/lib/**" ], verbose: false });
+        var majic = new Majic(opts, { scan: [ "test/mock/**", "config/**", "src/lib/**" ], verbose: false });
 
         majic.init().then(function() {
             return new q(function (resolve) {
@@ -203,9 +204,7 @@ module.exports = {
                 } else {
                     resolve(undefined);
                 }
-            }).then(function () {
-                return majic.scan_paths([ "test/mock/**" ], true).then(majic.start.bind(majic));
-            });
+            }).then(majic.start.bind(majic));
         });
 
         return function(fn) {
