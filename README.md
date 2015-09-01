@@ -63,12 +63,6 @@ $ npm install --save majic
 
 **Step 4: setup an application file**
 
-*./src/main/config.js*
-```javascript
-module.exports = {
-    "greeting: "Hello World!");
-}
-
 *./src/main/helloworld.js*
 
 ```javascript
