@@ -84,25 +84,7 @@ majic: resolving module helloworld with args []
 Hello World!
 ```
 
-## Automatic package.json inclusion
-Majic will autoscan and require all dependencies declared in your package.json.
-
-**Example: ./package.json**
-
-```js
-{
-    "dependencies": {
-        "bluebird": "^2.3.2",
-        "lodash": "^2.4.1",
-        "majic": "0.0.10",
-        "express": "^4.10.2"
-    }
-}
-```
-
-The above example would automatically require the bluebird, lodash, majic, and express libraries available (by name) for dependency injection.
-
-#### Automatic dependency injection
+## Automatic dependency injection
 
 Majic automatically names dependencies, and injects them into module declarations (functions).  Try adding the following file:
 
@@ -137,6 +119,24 @@ Hello World!
 ```
 
 Notice that the new config.js file was auto-scanned automatically injected into the helloworld component which declared it as a dependency.
+
+## Automatic package.json inclusion
+Majic will autoscan and require all dependencies declared in your package.json.
+
+**Example: ./package.json**
+
+```js
+{
+    "dependencies": {
+        "bluebird": "^2.3.2",
+        "lodash": "^2.4.1",
+        "majic": "0.0.10",
+        "express": "^4.10.2"
+    }
+}
+```
+
+The above example would automatically require the bluebird, lodash, majic, and express libraries available (by name) for dependency injection.
 
 #### Name mangling
 
