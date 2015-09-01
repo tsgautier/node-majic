@@ -234,7 +234,7 @@ If you declare [chai-as-promised](http://chaijs.com/plugins/chai-as-promised) th
 
 ## Automatic mock inclusion
 
-During test execution, Majic will autoscan the directory "./test/mock" before scanning for components to allow for mocks override component definitions. 
+During test execution, Majic will autoscan the directory "./test/mock" before scanning for components to allow for mocks to override component definitions. 
 
 ## Recommended setup
 
