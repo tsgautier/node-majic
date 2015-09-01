@@ -91,7 +91,7 @@ Majic automatically names dependencies, and injects them into module declaration
 *./src/main/config.js*
 ```javascript
 module.exports = {
-    "greeting: "Hello World!";
+    "greeting": "Hello World!";
 }
 ```
 
