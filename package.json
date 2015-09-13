@@ -13,11 +13,11 @@
     "url": "git@github.com:tsgautier/node-majic.git"
   },
   "dependencies": {
-    "app-root-path": "^1.0.0",
-    "bluebird": "^2.3.11",
-    "glob": "^4.0.6",
+    "app-root-path": "1.0.0",
+    "bluebird": "2.10.0",
+    "glob": "5.0.14",
     "introspect": "0.0.3",
-    "lodash": "^2.4.1"
+    "lodash": "3.10.1"
   },
   "bin": {
     "majic": "./bin/majic"
