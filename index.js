@@ -102,7 +102,7 @@ Majic.prototype.load_module = function(file, override) {
             var path = file.split("/");
             var name = path[path.length-1].split('.')[0]
 
-            if (stats.isFile() && !_.contains(this.exclude, name)) {
+            if (stats.isFile() && _.find(this.exclude, name) === undefined) {
                 this.crequire(name, file, false, override);
             }
             resolve(true);
