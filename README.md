@@ -153,7 +153,7 @@ Majic will automajically alias common libraries for you.  the common aliases are
 * lodash: '_'
 
 ## Automajic source scanning
-After including dependencies from package.json, majic will will autoscan any files in the ./config, ./src/lib and ./src/main directories (this is configurable).
+After including dependencies from package.json, majic will autoscan any files in the ./config, ./src/lib and ./src/main directories (this is configurable).
 
 Due to the asynchronous and promise based dependency chains, your application will start in whatever order your dependencies are available, as fast as they are available.
 
@@ -204,14 +204,14 @@ When testing, majic will only scan ./src/lib, so that your application will not 
 
 ## Using Majic manually
 
-If you need or want to get an instance of majic, the result of the start() method returns a promise which will provide you with the running instance of majic as the resolved value.
+If you need or want to get an instance of majic, the result of the start() method returns the instance of majic.
 
 **Example:**
 
 ```coffee-script
-require('majic').start().then (majic) ->
-    majic.inject (_) ->
-        console.log 'resolved _ to', _
+majic = require('majic').start()
+majic.inject (_) ->
+    console.log 'resolved _ to', _
 ```
 
 ## Testing

@@ -184,7 +184,7 @@ Majic.prototype.init = function() {
 
 Majic.prototype.start = function() {
     this.ready.resolve(this);
-    return this.ready.promise;
+    return this;
 }
 
 module.exports = {
