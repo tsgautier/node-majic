@@ -13,7 +13,7 @@ Bootstrap majic in one simple line by declaring it as the npm start script in yo
 ```javascript
 {
     "dependencies": {
-        "majic": "0.0.10"
+        "majic": "^0.0.24"
     },
     "scripts": {
         "start": "./node_modules/majic/bin/majic"
@@ -201,6 +201,18 @@ If you return a promise from your module, the resolved value (when ready) will b
 Majic scans both ./src/lib and ./src/main to allow you to declare modular non-executable components in ./src/lib and executable components in ./src/main.
 
 When testing, majic will only scan ./src/lib, so that your application will not start by default when testing.
+
+## Using Majic manually
+
+If you need or want to get an instance of majic, the result of the start() method returns a promise which will provide you with the running instance of majic as the resolved value.
+
+**Example:**
+
+```coffee-script
+require('majic').start().then (majic) ->
+    majic.inject (_) ->
+        console.log 'resolved _ to', _
+```
 
 ## Testing
 
