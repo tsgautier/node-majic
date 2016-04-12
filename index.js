@@ -25,6 +25,7 @@ var Majic = function options(opts, defs) {
         ready: defer(),
         container: {},
         root: appRootPath,
+        pkgroot: appRootPath,
         verbose: true,
         scan: [ "config/**", "src/lib/**", "src/main/**" ]
     });
@@ -163,7 +164,7 @@ Majic.prototype.init = function() {
     this.define('process', process)
     this.define('argv', process.argv);
 
-    this.package = require(this.root+'/package.json');
+    this.package = require(pkgroot + '/package.json');
 
     // node dependencies
     _.each(this.package.declare, function (dependency) {
