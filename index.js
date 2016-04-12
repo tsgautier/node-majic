@@ -164,7 +164,7 @@ Majic.prototype.init = function() {
     this.define('process', process)
     this.define('argv', process.argv);
 
-    this.package = require(pkgroot + '/package.json');
+    this.package = require(this.pkgroot + '/package.json');
 
     // node dependencies
     _.each(this.package.declare, function (dependency) {
