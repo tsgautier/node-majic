@@ -1,7 +1,7 @@
 {
   "name": "majic",
   "keywords": "ioc dependency injection asynchronous promise promises unit test scan auto-discovery",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "A micro javascript/node.js ioc dependency injection container that uses promises and auto-discovery.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
