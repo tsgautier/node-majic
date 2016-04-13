@@ -138,6 +138,10 @@ Majic will autoscan and require all dependencies declared in your package.json.
 
 The above example would automatically require the bluebird, lodash, majic, and express libraries available (by name) for dependency injection.
 
+#### Package available as a dependency
+
+Majic will automatically declare a dependency named 'package' which corresponds to your application's package.json.
+
 #### Name mangling
 
 Since package naming conventions allow characters that are not allowed in javascript variable naming syntax, majic will automatically convert illegal characters to the underscore ('_') character.
@@ -246,7 +250,7 @@ If you declare [chai-as-promised](http://chaijs.com/plugins/chai-as-promised) th
 
 ## Automatic mock inclusion
 
-During test execution, Majic will autoscan the directory "./test/mock" before scanning for components to allow for mocks to override component definitions. 
+During test execution, Majic will autoscan the directory "./test/mock" before scanning for components to allow for mocks to override component definitions.
 
 ## Recommended setup
 

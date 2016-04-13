@@ -158,13 +158,14 @@ Majic.prototype.dependencies = function(dependencies) {
 }
 
 Majic.prototype.init = function() {
+    this.package = require(this..pkgroot + '/package.json');
+
     this.alias('bluebird', 'q');
     this.alias('lodash', '_');
     this.alias('underscore', '_');
     this.define('process', process)
     this.define('argv', process.argv);
-
-    this.package = require(this.pkgroot + '/package.json');
+    this.define('package', this.package);
 
     // node dependencies
     _.each(this.package.declare, function (dependency) {
