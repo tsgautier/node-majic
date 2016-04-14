@@ -17,6 +17,10 @@ function defer() {
     return deferred;
 }
 
+function isClass(v) {
+     return typeof v === 'function' && /^\s*class\s+/.test(v.toString());
+}
+
 var Majic = function options(opts, defs) {
     if (!_.isObject(opts)) opts = { root: opts };
 
@@ -30,6 +34,7 @@ var Majic = function options(opts, defs) {
         scan: [ "config/**", "src/lib/**", "src/main/**" ]
     });
 }
+
 
 Majic.prototype.declare = function(name, timeout, override) {
     var v = override ? undefined : this.container[name];
@@ -79,7 +84,7 @@ Majic.prototype.crequire = function(name, path, module, override) {
     var deferred = this.declare(name, module ? undefined : TIMEOUT, false);
     var req = require(path);
 
-    if (_.isFunction(req) && !module) {
+    if (_.isFunction(req) && !module && !isClass(req)) {
         if (this.verbose) console.log(this.PREFIX, "loading module", name, from, path);
         this.inject(req, name).then(deferred.resolve);
     } else {
