@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-require('majic').start();
+var opts = {}
+if (process.argv[2] !== null && process.argv[2] !== void(0)) opts.filter = process.argv[2]
+require('majic').start(opts);

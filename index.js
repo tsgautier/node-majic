@@ -197,7 +197,6 @@ Majic.prototype.start = function() {
 module.exports = {
     start: function (opts) {
         if (opts === null || opts === void(0)) { opts = {}; }
-        if (process.argv[2] !== null && process.argv[2] !== void(0)) opts.filter = process.argv[2]
         var majic = new Majic(opts);
         return majic.init().then(majic.start.bind(majic));
     },
