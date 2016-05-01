@@ -31,7 +31,7 @@ var Majic = function options(opts, defs) {
         root: appRootPath,
         pkgroot: appRootPath,
         verbose: true,
-        scan: [ "config/**", "src/lib/**", "src/main/**" ]
+        scan: [ "src/config/**", "src/lib/**", "src/main/**" ]
     });
 }
 
@@ -201,7 +201,7 @@ module.exports = {
         return majic.init().then(majic.start.bind(majic));
     },
     test: function test(opts) {
-        var majic = new Majic(opts, { scan: [ "test/mock/**", "config/**", "src/lib/**" ], verbose: false });
+        var majic = new Majic(opts, { scan: [ "src/test/mock/**", "src/config/**", "src/lib/**" ], verbose: false });
 
         majic.init().then(function() {
             return new q(function (resolve) {

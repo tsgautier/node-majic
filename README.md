@@ -76,7 +76,7 @@ module.exports = function() {
 ```
 $ npm start
 
-majic: scanning path ./config/** for modules
+majic: scanning path ./src/config/** for modules
 majic: scanning path ./src/lib/** for modules
 majic: scanning path ./src/main/** for modules
 majic: loading module helloworld from ./src/main/helloworld.js
@@ -109,7 +109,7 @@ Then re-run the application.
 ```
 $ npm start
 
-majic: scanning path ./config/** for modules
+majic: scanning path ./src/config/** for modules
 majic: scanning path ./src/lib/** for modules
 majic: scanning path ./src/main/** for modules
 majic: defined module config from ./src/main/config.js
@@ -226,12 +226,12 @@ To test a component, using a framework such as [Mocha](https://github.com/mochaj
 
 Once this is done, the instance returned can inject parameters into your test methods, just like it can into dynamic module functions.
 
-**Example: ./test/unit/logger.coffee**
+**Example: ./src/test/unit/logger.coffee**
 
 ```coffee-script
-describe 'logger', ->
-    inject = require('majic').test()
+inject = require('majic').test()
 
+describe 'logger', ->
     it 'should inject a mock instance of winston', inject (expect, winston) ->
         expect(winston.mock).to.equal(true);
 ```
@@ -283,9 +283,8 @@ And setup your mocha installation for recursive scanning and nice reporting:
 --compilers coffee:coffee-script/register
 ```
 
-Now, place your unit tests in ./test/unit and your mocks in ./test/mock and majic will take care of the rest when you test it all with npm test:
+Now, place your unit tests in ./src/test/unit and your mocks in ./src/test/mock and majic will take care of the rest when you test it all with npm test:
 
-```
 $ npm test
 
 > @ test
