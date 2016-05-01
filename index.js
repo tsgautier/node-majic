@@ -196,7 +196,7 @@ Majic.prototype.start = function() {
 
 module.exports = {
     start: function (opts) {
-        if (opts === null || opts === void(0)) { opts = {}; }
+        if (opts === null || opts === void(f0)) { opts = {}; }
         var majic = new Majic(opts);
         return majic.init().then(majic.start.bind(majic));
     },

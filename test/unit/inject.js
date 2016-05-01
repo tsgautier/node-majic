@@ -14,4 +14,9 @@ describe('inject', () => {
     it('should rename _\'s to -\'s', inject((name_with_dashes) => {
         expect(name_with_dashes).to.be.true;
     }));
+    it('should resolve the package.json as package', inject((package) => {
+        expect(package.dependencies).to.be.a('object');
+        expect(package.devDependencies).to.be.a('object');
+        expect(package.name).to.equal('majic');
+    }));
 });
