@@ -1,1 +1,1 @@
-var majic = require('./index.js').start();
+require('./index.js').start();
