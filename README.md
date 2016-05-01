@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tsgautier/node-majic.svg?branch=master)](https://travis-ci.org/tsgautier/node-majic)
+
 # Majic
 
 A micro javascript/node.js ioc dependency injection container that uses promises and auto-discovery.
