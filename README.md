@@ -233,9 +233,9 @@ Once this is done, the instance returned can inject parameters into your test me
 **Example: ./test/unit/logger.js**
 
 ``` javascript
-describe('logger', () => {
-    inject = require('majic').test()
+var inject = require('majic').test();
 
+describe('logger', () => {
     it('should inject a mock instance of winston', inject((expect, winston) => {
         expect(winston.mock).to.equal(true);
     }));
