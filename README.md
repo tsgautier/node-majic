@@ -15,7 +15,7 @@ Bootstrap majic in one simple line by declaring it as the npm start script in yo
 ```javascript
 {
     "dependencies": {
-        "majic": "^0.0.24"
+        "majic": "^0.0.36"
     },
     "scripts": {
         "start": "./node_modules/majic/bin/majic"
@@ -54,7 +54,7 @@ $ npm install --save majic
 
 *./package.json*
 
-```javascript
+``` javascript
    ...
    "scripts": {
        "start": "./node_modules/majic/bin/majic",
@@ -67,7 +67,7 @@ $ npm install --save majic
 
 *./src/main/helloworld.js*
 
-```javascript
+``` javascript
 module.exports = function() {
     console.log("Hello World!");
 }
@@ -91,7 +91,7 @@ Hello World!
 Majic automatically names dependencies, and injects them into module declarations (functions).  Try adding the following file:
 
 *./src/main/config.js*
-```javascript
+``` javascript
 module.exports = {
     "greeting": "Hello World!"
 }
@@ -99,8 +99,8 @@ module.exports = {
 
 And change the *./src/main/helloworld.js* file to:
 
-```javascript
-module.exports = function(config) {
+``` javascript
+module.exports = (config) => {
     console.log(config.greeting);
 }
 ```
@@ -127,7 +127,7 @@ Majic will autoscan and require all dependencies declared in your package.json.
 
 **Example: ./package.json**
 
-```js
+``` javascript
 {
     "dependencies": {
         "bluebird": "^2.3.2",
@@ -177,7 +177,7 @@ You can declare static values simply by exporting them via module.exports.  This
 
 **Example: ./config/myconfig.coffee**
 
-```
+``` javascript
 module.exports =
     host: 'localhost'
     port: '8080'
@@ -187,11 +187,12 @@ module.exports =
 
 You can declare modules which have dependencies injected by exporting a function rather than a static object.
 
-**Example: ./src/myapp.coffee**
+**Example: ./src/myapp.js**
 
-```
-module.exports = (myconfig) ->
-    console.log "app will start on #{myconfig.host} and port #{myconfig.port}"
+``` javascript
+module.exports = (myconfig) => {
+    console.log("app will start on ${myconfig.host} and port ${myconfig.port}");
+}
 ```
 
 The function exported in module.exports will only be executed once all the dependencies it declares are resolved.
@@ -214,10 +215,11 @@ If you need or want to get an instance of majic, the result of the start() metho
 
 **Example:**
 
-```coffee-script
-majic = require('majic').start()
-majic.inject (_) ->
-    console.log 'resolved _ to', _
+``` javascript
+majic = require('majic').start();
+majic.inject((_) => {
+    console.log('resolved _ to', _);
+}
 ```
 
 ## Testing
@@ -230,12 +232,14 @@ Once this is done, the instance returned can inject parameters into your test me
 
 **Example: ./test/unit/logger.coffee**
 
-```coffee-script
-describe 'logger', ->
+``` javascript
+describe('logger', () => {
     inject = require('majic').test()
 
-    it 'should inject a mock instance of winston', inject (expect, winston) ->
+    it('should inject a mock instance of winston', inject((expect, winston) => {
         expect(winston.mock).to.equal(true);
+    }));
+});
 ```
 
 The result of the inject method is a promise, so you will need a unit testing library that supports promises, such as [Mocha](https://github.com/mochajs/mocha), to use majic testing.
@@ -261,7 +265,7 @@ It is recommended to use [Mocha](https://github.com/mochajs/mocha) as your test 
 To set this up, your package.json should have the following entries:
 
 **Example: ./package.json**
-```json
+``` json
 {
   "devDependencies": {
     "mocha": "^2.0.1",
