@@ -230,7 +230,7 @@ To test a component, using a framework such as [Mocha](https://github.com/mochaj
 
 Once this is done, the instance returned can inject parameters into your test methods, just like it can into dynamic module functions.
 
-**Example: ./test/unit/logger.coffee**
+**Example: ./test/unit/logger.js**
 
 ``` javascript
 describe('logger', () => {
