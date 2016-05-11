@@ -38,6 +38,9 @@
     "istanbul": "^0.4.3",
     "istanbul-cobertura-badger": "^1.2.1"
   },
+  "declare": [
+      "fs"
+  ],
   "bin": {
     "majic": "./bin/majic"
   }
