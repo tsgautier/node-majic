@@ -48,6 +48,10 @@ Majic.prototype.declare = function(name, timeout, override) {
     return v;
 }
 
+Majic.prototype.declared = function(name) {
+    return this.container[name];
+}
+
 Majic.prototype.define = function(name, object) {
     this.declare(name).resolve(object);
     if (this.verbose) log.info(this.PREFIX, "defined module", name, "from global")
