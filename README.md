@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/tsgautier/node-majic.svg?branch=master)](https://travis-ci.org/tsgautier/node-majic)
 [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
+[![Coverage Status](https://coveralls.io/repos/github/tsgautier/node-majic/badge.svg?branch=master)](https://coveralls.io/github/tsgautier/node-majic?branch=master)
+
 
 # Majic
 
