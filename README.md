@@ -143,9 +143,11 @@ Majic will autoscan and require all dependencies declared in your package.json.
 
 The above example would automatically require the bluebird, lodash, majic, and express libraries available (by name) for dependency injection.
 
-## Declare additional dependencies via package.json
+#### Declare additional dependencies via package.json
 
-If you need to declare additional dependencies such as node modules (e.g. fs, http, etc.) then you can add a "declare" section to your package.json.  This is an array of strings.  For each string majic will load the declared dependency using node's inbuilt require and expose the package as an injectable majic dependency (note that you can later mock these, so prefer this method to raw require).
+If you need to declare additional modules to load that are not defined in the dependencies section of your package.json, such as node modules (e.g. fs, http, etc.), then you can add a "declare" section to your package.json.  
+
+This is an array of strings.  For each string majic will 'require' the declared dependency and expose the package as an injectable majic dependency (note that you can later mock these, so prefer this method to raw require).
 
 **Example: ./package.json**
 
