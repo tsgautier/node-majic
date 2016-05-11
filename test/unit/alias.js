@@ -1,4 +1,5 @@
-var inject = require('../../index.js').test();
+var approotpath = require('app-root-path');
+var inject = require(`${approotpath}/index.js`).test();
 var expect = require('chai').expect;
 
 describe('alias', () => {

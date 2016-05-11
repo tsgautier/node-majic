@@ -26,6 +26,7 @@
   "dependencies": {
     "app-root-path": "^1.0.0",
     "bluebird": "^3.1.5",
+    "coffee-script": "^1.10.0",
     "coveralls": "^2.11.9",
     "glob": "^6.0.4",
     "introspect": "0.0.3",
