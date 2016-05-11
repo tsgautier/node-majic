@@ -15,7 +15,7 @@
   "version": "0.0.39",
   "description": "A micro javascript/node.js ioc dependency injection container that uses promises and auto-discovery.",
   "scripts": {
-    "test": "./node_modules/.bin/istanbul cover -report cobertura ./node_modules/.bin/_mocha test/unit"
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "author": "Taylor Gautier",
   "license": "MIT",
@@ -26,6 +26,7 @@
   "dependencies": {
     "app-root-path": "^1.0.0",
     "bluebird": "^3.1.5",
+    "coveralls": "^2.11.9",
     "glob": "^6.0.4",
     "introspect": "0.0.3",
     "lodash": "^4.1.0"
