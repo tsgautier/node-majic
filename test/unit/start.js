@@ -1,5 +1,8 @@
+var approotpath = require('app-root-path');
+var majic = require(`${approotpath}/index.js`);
+
 describe('start script', () => {
     it('should start with non null opts', () => {
-        require('../../index.js').start({ verbose: false, scan: [] });
+        return majic.start({ verbose: false, scan: [] });
     });
 });

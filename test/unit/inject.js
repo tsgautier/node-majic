@@ -1,7 +1,11 @@
-var inject = require('../../index.js').test();
+var approotpath = require('app-root-path');
+var inject = require(`${approotpath}/index.js`).test({ scan: [ 'test/mock/*', 'config/**', 'test/roots/inject/**' ]});
 var expect = require('chai').expect;
 
 describe('inject', () => {
+    it('should inject a config object', inject((config) => {
+        expect(config.greeting).to.equal("Hello Majic!");
+    }));
     it('should inject a mock object', inject((mock) => {
         expect(mock.mock).to.be.true;
     }));

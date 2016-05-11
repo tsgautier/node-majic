@@ -36,10 +36,11 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
     "istanbul": "^0.4.3",
-    "istanbul-cobertura-badger": "^1.2.1"
+    "istanbul-cobertura-badger": "^1.2.1",
+    "sinon": "^1.17.4"
   },
   "declare": [
-      "fs"
+    "fs"
   ],
   "bin": {
     "majic": "./bin/majic"

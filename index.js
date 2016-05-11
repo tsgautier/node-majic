@@ -1,11 +1,10 @@
-var TIMEOUT = 4000;
-
 var _ = require('lodash'),
     q = require('bluebird'),
     fs = require('fs'),
     glob = require('glob'),
     introspect = require('introspect'),
     appRootPath = require('app-root-path'),
+    log = require('./log.js'),
     TimeoutError = q.TimeoutError;
 
 function defer() {
@@ -31,10 +30,10 @@ var Majic = function options(opts, defs) {
         root: appRootPath,
         pkgroot: appRootPath,
         verbose: true,
+        timeout: 4000,
         scan: [ "config/**", "src/lib/**", "src/main/**" ]
     });
 }
-
 
 Majic.prototype.declare = function(name, timeout, override) {
     var v = override ? undefined : this.container[name];
@@ -42,7 +41,7 @@ Majic.prototype.declare = function(name, timeout, override) {
         this.container[name] = v = defer();
         if (timeout) {
             v.promise.timeout(timeout).catch(TimeoutError, function() {
-                if (this.verbose) console.warn(this.PREFIX, "timeout resolving " + name);
+                if (this.verbose) log.warn(this.PREFIX, "timeout resolving " + name);
             }.bind(this));
         }
     }
@@ -51,7 +50,7 @@ Majic.prototype.declare = function(name, timeout, override) {
 
 Majic.prototype.define = function(name, object) {
     this.declare(name).resolve(object);
-    if (this.verbose) console.log(this.PREFIX, "defined module", name, "from global")
+    if (this.verbose) log.info(this.PREFIX, "defined module", name, "from global")
 }
 
 Majic.prototype.resolve = function(name, timeout) {
@@ -60,7 +59,7 @@ Majic.prototype.resolve = function(name, timeout) {
 
 Majic.prototype.alias = function(src, dst) {
     this.resolve(src).then(function(v) {
-        if (this.verbose) console.log(this.PREFIX, "aliased module", dst, "from", src);
+        if (this.verbose) log.info(this.PREFIX, "aliased module", dst, "from", src);
         this.declare(dst).resolve(v);
     }.bind(this));
 }
@@ -69,8 +68,8 @@ Majic.prototype.inject = function(fn, name) {
     var params = introspect(fn);
 
     return this.ready.promise.then(function() {
-        return q.all(_.map(params, function(p) { return this.resolve(p, TIMEOUT) }.bind(this))).then(function(args) {
-            if (this.verbose && name) console.log(this.PREFIX, "resolving module", name, "with args", params);
+        return q.all(_.map(params, function(p) { return this.resolve(p, this.timeout) }.bind(this))).then(function(args) {
+            if (this.verbose && name) log.info(this.PREFIX, "resolving module", name, "with args", params);
             return fn.apply(null, args);
         }.bind(this));
     }.bind(this));
@@ -81,14 +80,14 @@ Majic.prototype.crequire = function(name, path, module, override) {
 
     var from = module ? "from npm" : "from"
     if (this.container[name] && !override) { return this.container[name].promise; }
-    var deferred = this.declare(name, module ? undefined : TIMEOUT, false);
+    var deferred = this.declare(name, module ? undefined : this.timeout, false);
     var req = require(path);
 
     if (_.isFunction(req) && !module && !isClass(req)) {
-        if (this.verbose) console.log(this.PREFIX, "loading module", name, from, path);
+        if (this.verbose) log.info(this.PREFIX, "loading module", name, from, path);
         this.inject(req, name).then(deferred.resolve);
     } else {
-        if (this.verbose) console.log(this.PREFIX, "defined module", name, from, path);
+        if (this.verbose) log.info(this.PREFIX, "defined module", name, from, path);
         deferred.resolve(req);
     }
 
@@ -97,7 +96,7 @@ Majic.prototype.crequire = function(name, path, module, override) {
 
 Majic.prototype.nrequire = function(name) {
     this.declare(name).resolve(require(name));
-    if (this.verbose) console.log(this.PREFIX, "defined module", name, "from node require");
+    if (this.verbose) log.info(this.PREFIX, "defined module", name, "from node require");
 }
 
 Majic.prototype.load_module = function(file, override) {
@@ -120,7 +119,7 @@ Majic.prototype.scan_paths = function(globs, override) {
     return q.all(_.map(globs, function(pattern) {
         return new q(function(resolve, reject) {
             var path = this.root+"/"+pattern
-            if (this.verbose) console.log(this.PREFIX, "scanning path", path, "for modules")
+            if (this.verbose) log.info(this.PREFIX, "scanning path", path, "for modules")
             glob(path, function(err, files) {
                 if (err) { return reject(err); }
                 q.all(_.map(files, function(f) {
@@ -204,14 +203,12 @@ module.exports = {
         var majic = new Majic(opts, { scan: [ "test/mock/**", "config/**", "src/lib/**" ], verbose: false });
 
         majic.init().then(function() {
-            return new q(function (resolve) {
-                if (majic.package.devDependencies) {
-                    resolve(majic.dependencies(majic.package.devDependencies));
-                } else {
-                    resolve(undefined);
-                }
-            }).then(majic.start.bind(majic));
-        });
+            if (majic.package.devDependencies) {
+                return majic.dependencies(majic.package.devDependencies);
+            } else {
+                return undefined;
+            }
+        }).then(majic.start.bind(majic));
 
         return function(fn) {
             return function() { return majic.inject(fn, "injected test"); }

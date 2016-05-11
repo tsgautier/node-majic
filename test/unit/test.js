@@ -1,6 +1,7 @@
-var inject = require('../../index.js').test();
+var approotpath = require('app-root-path');
+var inject = require(`${approotpath}/index.js`).test();
 
-describe('test', () => {
+describe('tests', () => {
     it('should inject expect', inject((expect) => {
         expect(expect).to.be.ok;
     }));
