@@ -5,7 +5,7 @@
 
 # Majic
 
-A lightweight javascript ioc container that favors source scanning + convention vs boilerplate configuration, supports promises, coffeescript, mocha and chai.
+A lightweight javascript ioc container that favors source scanning + convention vs boilerplate configuration, provides native support for promises, coffeescript, mocha and chai and sinon.
 
 Majic uses Angular style dependency injection, automatic source directory scanning, and promised based asynchronous module loading to make modularizing, running, and testing your application drop dead simple.
 
