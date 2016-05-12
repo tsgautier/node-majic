@@ -4,6 +4,7 @@
 
 
 # Majic
+[![Join the chat at https://gitter.im/tsgautier/node-majic](https://badges.gitter.im/tsgautier/node-majic.svg)](https://gitter.im/tsgautier/node-majic?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A lightweight javascript ioc container that favors source scanning and convention over configuration, provides native support for promises, coffeescript, mocha, chai and sinon.
 
