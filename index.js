@@ -41,7 +41,10 @@ Majic.prototype.declare = function(name, timeout, override) {
         this.container[name] = v = defer();
         if (timeout) {
             v.promise.timeout(timeout).catch(TimeoutError, function() {
-                if (this.verbose) log.warn(this.PREFIX, "timeout resolving " + name);
+                if (this.verbose) {
+                    var found = v.found ? '' : "(not found)";
+                    log.warn(this.PREFIX, "timeout resolving", name, found);
+                }
             }.bind(this));
         }
     }
@@ -53,6 +56,7 @@ Majic.prototype.declared = function(name) {
 }
 
 Majic.prototype.define = function(name, object) {
+    this.declare(name).found = true;
     this.declare(name).resolve(object);
     if (this.verbose) log.info(this.PREFIX, "defined module", name, "from global")
 }
@@ -64,6 +68,7 @@ Majic.prototype.resolve = function(name, timeout) {
 Majic.prototype.alias = function(src, dst) {
     this.resolve(src).then(function(v) {
         if (this.verbose) log.info(this.PREFIX, "aliased module", dst, "from", src);
+        this.declare(dst).found = true;
         this.declare(dst).resolve(v);
     }.bind(this));
 }
@@ -87,6 +92,7 @@ Majic.prototype.crequire = function(name, path, module, override) {
     var deferred = this.declare(name, module ? undefined : this.timeout, false);
     var req = require(path);
 
+    deferred.found = true;
     if (_.isFunction(req) && !module && !isClass(req)) {
         if (this.verbose) log.info(this.PREFIX, "loading module", name, from, path);
         this.inject(req, name).then(deferred.resolve);

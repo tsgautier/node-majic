@@ -30,7 +30,8 @@ describe('timeout', () => {
         //
         // so we have to really do real timeouts here, which is obviously not right
         return new bluebird(() => true).timeout(50).catch(() => {
-            expect(log.warn).to.have.been.calledTwice;
+            expect(log.warn).to.have.been.calledWith("majic:", "timeout resolving", "timeout", "");
+            expect(log.warn).to.have.been.calledWith("majic:", "timeout resolving", "foo", "(not found)");
         });
     });
 });
