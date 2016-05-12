@@ -5,6 +5,8 @@
 
 # Majic
 
+[![Join the chat at https://gitter.im/tsgautier/node-majic](https://badges.gitter.im/tsgautier/node-majic.svg)](https://gitter.im/tsgautier/node-majic?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A micro javascript/node.js ioc dependency injection container that uses promises and auto-discovery.
 
 Majic uses Angular style dependency injection, automatic source directory scanning, and promised based asynchronous module loading to make modularizing, running, and testing your application drop dead simple.
