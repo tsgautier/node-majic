@@ -5,7 +5,7 @@
 
 # Majic
 
-A micro javascript/node.js ioc dependency injection container that uses promises and auto-discovery.
+A lightweight javascript ioc container that favors source scanning + convention vs boilerplate configuration, supports promises, coffeescript, mocha and chai.
 
 Majic uses Angular style dependency injection, automatic source directory scanning, and promised based asynchronous module loading to make modularizing, running, and testing your application drop dead simple.
 
