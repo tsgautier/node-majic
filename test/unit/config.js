@@ -11,6 +11,13 @@ describe('config', () => {
         })();
     });
 
+    it('should mock modules before loading them via declare', () => {
+        var inject = majic.test({ root: `${approotpath}/test/roots/declare`, scan: [ 'mock/**' ] });
+        return inject((fs) => {
+            expect(fs).to.eql({});
+        })();
+    });
+
     it('should accept root configuration',() => {
         var inject = majic.test({ root: `${approotpath}/test/roots/config`})
         return inject((rootconfig) => {

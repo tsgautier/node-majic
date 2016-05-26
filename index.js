@@ -181,11 +181,6 @@ Majic.prototype.init = function() {
     this.define('argv', process.argv);
     this.define('package', this.package);
 
-    // node dependencies
-    _.each(this.package.declare, function (dependency) {
-        this.nrequire(dependency);
-    }.bind(this));
-
     return new q(function (resolve) {
         if (this.package.dependencies) {
             resolve(this.dependencies(this.package.dependencies));
@@ -194,7 +189,14 @@ Majic.prototype.init = function() {
         }
     }.bind(this)).then(function () {
         if (!this.package.cio) { this.package.cio = {} };
-        return this.scan_paths(this.package.cio.scan || this.scan);
+        return this.scan_paths(this.package.cio.scan || this.scan).then(function (result) {
+            // node dependencies
+            _.each(this.package.declare, function (dependency) {
+                this.nrequire(dependency);
+            }.bind(this));
+
+            return result;
+        }.bind(this));
     }.bind(this));
 }
 
