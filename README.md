@@ -278,6 +278,30 @@ If you declare [chai-as-promised](http://chaijs.com/plugins/chai-as-promised) th
 
 During test execution, Majic will autoscan the directory "./test/mock" before scanning for components to allow for mocks to override component definitions.
 
+## Manul mock declaration
+
+If you need/want to manually declare mocks to be used then list them in the majic options using the option "mocks".  For example, the actual majic unit test
+which tests this feature demonstrates how to do this:
+
+``` javascript
+var approotpath = require('app-root-path');
+var majic = require(`${approotpath}/index.js`);
+var expect = require('chai').expect;
+
+describe('mock', () => {
+    it('should allow mocks to be passed in during instantiation', () => {
+        var mocked = { some: "mock" };
+        var mocks = {
+            glob: mocked
+        }
+        var inject = majic.test({ mocks: mocks });
+        return inject((glob) => {
+            expect(glob).to.equal(mocked);
+        })();
+    });
+});
+```
+
 ## Recommended setup
 
 It is recommended to use [Mocha](https://github.com/mochajs/mocha) as your test runner and Chai for expect.

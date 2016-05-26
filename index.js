@@ -181,6 +181,10 @@ Majic.prototype.init = function() {
     this.define('argv', process.argv);
     this.define('package', this.package);
 
+    _.each(this.mocks, function(v, k) {
+        this.define(k, v);
+    }.bind(this));
+
     return new q(function (resolve) {
         if (this.package.dependencies) {
             resolve(this.dependencies(this.package.dependencies));
