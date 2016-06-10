@@ -32,6 +32,13 @@ describe('config', () => {
         })();
     });
 
+    it('should read a majic options file',() => {
+        var inject = majic.test({ root: `${approotpath}/test/roots/fileopts` });
+        return inject((http) => {
+            expect(http).to.be.ok;
+        })();
+    });
+
     it('should accept scan configuration', () => {
         var inject = majic.test({ scan: [ `test/roots/scan/**` ] });
         return inject((scan) => {

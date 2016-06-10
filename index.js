@@ -23,12 +23,22 @@ function isClass(v) {
 var Majic = function options(opts, defs) {
     if (!_.isObject(opts)) opts = { root: opts };
 
-    _.defaults(this, opts, defs, {
+    var root = _.defaults({}, opts, defs, { root: appRootPath });
+    var fileopts = {}
+    try {
+        fileopts = require(root.root + '/majic.json');
+        console.log(fileopts);
+    } catch (error) {
+        if (error.message.indexOf("Cannot find") < 0) throw error;
+    }
+
+    _.defaults(this, opts, defs, fileopts, {
         PREFIX: "majic:",
         ready: defer(),
         container: {},
-        root: appRootPath,
+        root: root.root,
         pkgroot: appRootPath,
+        require: [],
         verbose: true,
         timeout: 4000,
         scan: [ "config/**", "src/lib/**", "src/main/**" ]
@@ -195,7 +205,7 @@ Majic.prototype.init = function() {
         if (!this.package.cio) { this.package.cio = {} };
         return this.scan_paths(this.package.cio.scan || this.scan).then(function (result) {
             // node dependencies
-            _.each(this.package.declare, function (dependency) {
+            _.each(this.require.concat(this.package.declare || []), function (dependency) {
                 this.nrequire(dependency);
             }.bind(this));
 
