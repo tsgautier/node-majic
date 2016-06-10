@@ -249,20 +249,20 @@ You can override any of majic's default options using an options file 'majic.jso
 **Example majic.json**
 ``` javascript
 {
-    verbose: false
+    "verbose": false
 }
 ```
 The following are the default options for majic:
 
 ``` javascript
 {
-    PREFIX: "majic:",                                   // the default logging prefix
-    root: appRootPath,                                  // the path where scanning should stat from
-    pkgroot: appRootPath,                               // the path where the package.json file is located
-    require: [],                                        // a list of packages to require automatically (e.g. fs, http, etc.)
-    verbose: true,                                      // verbose output
-    timeout: 4000,                                      // how long to wait for a module to be ready
-    scan: [ "config/**", "src/lib/**", "src/main/**" ]  // the scan path
+    "PREFIX": "majic:",                                   // the default logging prefix
+    "root": appRootPath,                                  // the path where scanning should stat from
+    "pkgroot": appRootPath,                               // the path where the package.json file is located
+    "require": [],                                        // a list of packages to require automatically (e.g. fs, http, etc.)
+    "verbose": true,                                      // verbose output
+    "timeout": 4000,                                      // how long to wait for a module to be ready
+    "scan": [ "config/**", "src/lib/**", "src/main/**" ]  // the scan path
 }
 ```
 
