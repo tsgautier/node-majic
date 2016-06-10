@@ -1,3 +1,5 @@
 language: node_js
 node_js:
   - "6.0"
+after_success:
+  - '/node_modules/.bin/istanbul-coveralls'

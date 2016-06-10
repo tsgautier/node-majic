@@ -15,7 +15,7 @@
   "version": "0.0.47",
   "description": "A micro javascript/node.js ioc dependency injection container",
   "scripts": {
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && ./node_modules/.bin/istanbul-coveralls"
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec"
   },
   "author": "Taylor Gautier",
   "license": "MIT",
