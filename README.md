@@ -263,6 +263,7 @@ The following are the default options for majic:
     verbose: true,                                      // verbose output
     timeout: 4000,                                      // how long to wait for a module to be ready
     scan: [ "config/**", "src/lib/**", "src/main/**" ]  // the scan path
+}
 ```
 
 ## Testing
