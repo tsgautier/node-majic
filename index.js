@@ -27,7 +27,6 @@ var Majic = function options(opts, defs) {
     var fileopts = {}
     try {
         fileopts = require(root.root + '/majic.json');
-        console.log(fileopts);
     } catch (error) {
         if (error.message.indexOf("Cannot find") < 0) throw error;
     }
