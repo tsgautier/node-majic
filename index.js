@@ -225,7 +225,7 @@ module.exports = {
         return majic.init().then(majic.start.bind(majic));
     },
     test: function test(opts) {
-        var majic = new Majic(opts, { scan: [ "test/mock/**", "config/**", "src/lib/**" ], verbose: false });
+        var majic = new Majic(opts, { scan: [ "test/mock/**", "config/**", "src/config/**", "src/lib/**" ], verbose: false });
 
         majic.init().then(function() {
             if (majic.package.devDependencies) {
