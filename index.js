@@ -40,7 +40,7 @@ var Majic = function options(opts, defs) {
         require: [],
         verbose: true,
         timeout: 4000,
-        scan: [ "config/**", "src/lib/**", "src/main/**" ]
+        scan: [ "config/**", "src/config/**", "src/lib/**", "src/main/**" ]
     });
 }
 
