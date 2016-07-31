@@ -15,7 +15,8 @@
   "version": "0.0.51",
   "description": "A micro javascript/node.js ioc dependency injection container",
   "scripts": {
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "test": "./node_modules/mocha/bin/mocha",
+    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
     "coveralls": "istanbul-coveralls"
   },
   "author": "Taylor Gautier",
@@ -26,20 +27,20 @@
   },
   "dependencies": {
     "app-root-path": "^1.0.0",
-    "bluebird": "^3.1.5",
+    "bluebird": "^3.4.1",
     "coffee-script": "^1.10.0",
-    "glob": "^6.0.4",
+    "glob": "^7.0.5",
     "introspect": "0.0.3",
     "lodash": "^4.1.0"
   },
   "devDependencies": {
-    "mocha": "^2.3.3",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "coveralls": "^2.11.9",
     "istanbul": "^0.4.3",
     "istanbul-cobertura-badger": "^1.2.1",
     "istanbul-coveralls": "^1.0.3",
-    "coveralls": "^2.11.9",
+    "mocha": "^2.5.3",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0"
   },
