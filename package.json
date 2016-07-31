@@ -12,7 +12,7 @@
     "scan",
     "auto-discovery"
   ],
-  "version": "0.0.51",
+  "version": "0.0.52",
   "description": "A micro javascript/node.js ioc dependency injection container",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha",
