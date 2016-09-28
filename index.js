@@ -94,6 +94,8 @@ Majic.prototype.inject = function(fn, name) {
 }
 
 Majic.prototype.crequire = function(name, path, module, override) {
+    if (_.indexOf(this.exclude, name) >= 0) return;
+
     name = name.replace(/\-/gi, '_');
 
     var from = module ? "from npm" : "from"
@@ -126,7 +128,7 @@ Majic.prototype.load_module = function(file, override) {
             var path = file.split("/");
             var name = path[path.length-1].split('.')[0]
 
-            if (stats.isFile() && _.find(this.exclude, name) === undefined) {
+            if (stats.isFile()) {
                 this.crequire(name, file, false, override);
             }
             resolve(true);
